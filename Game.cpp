@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
+#include <sstream>
+#include <windows.h>
 
 Game::Game()
 {
@@ -20,12 +22,47 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
+
 	brick.width = 10;
 	brick.height = 2;
-	brick.x_position = 0;
+	brick.x_position = 5;
 	brick.y_position = 5;
 	brick.doubleThick = true;
 	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+
+	brick.width = 10;
+	brick.height = 2;
+	brick.x_position = 20;
+	brick.y_position = 5;
+	brick.doubleThick = true;
+	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+
+	brick.width = 10;
+	brick.height = 2;
+	brick.x_position = 35;
+	brick.y_position = 5;
+	brick.doubleThick = true;
+	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+
+	brick.width = 10;
+	brick.height = 2;
+	brick.x_position = 50;
+	brick.y_position = 5;
+	brick.doubleThick = true;
+	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+
+	brick.width = 10;
+	brick.height = 2;
+	brick.x_position = 65;
+	brick.y_position = 5;
+	brick.doubleThick = true;
+	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+	
 }
 
 void Game::ResetBall()
@@ -69,7 +106,45 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+	for (int i = 0; i < bricks.size(); i++)
+	{
+		bricks.at(i).Draw();
+	}
+
+	if (bricks.empty()) {
+		std::string text = "You win! Press R to play again.";
+
+		HANDLE stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD coord;
+
+		GetConsoleScreenBufferInfo(stdoutHandle, &csbi);
+		int width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+		coord.X = (short)((width - text.length()) / 2);
+		coord.Y = (short)(height / 2);
+		SetConsoleCursorPosition(stdoutHandle, coord);
+		std::cout << text << std::endl;
+	}
+
+	if (ball.y_position == 35)
+	{
+		std::string text = "You Lose. Press R to play again.";
+
+		HANDLE stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD coord;
+
+		GetConsoleScreenBufferInfo(stdoutHandle, &csbi);
+		int width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+		coord.X = (short)((width - text.length()) / 2);
+		coord.Y = (short)(height / 2);
+		SetConsoleCursorPosition(stdoutHandle, coord);
+		std::cout << text << std::endl;
+	}
 
 	Console::Lock(false);
 }
@@ -77,16 +152,35 @@ void Game::Render() const
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
-	{
-		brick.color = ConsoleColor(brick.color - 1);
-		ball.y_velocity *= -1;
+	for (int i = 0; i < bricks.size(); i++) {
+		if (bricks.at(i).Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		{
+			bricks.at(i).color = ConsoleColor(bricks.at(i).color - 1);
+			ball.y_velocity *= -1;
 
-		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
-
+			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+			for (auto it = bricks.begin(); it != bricks.end();)
+			{
+				if ((it->color) == Black)
+				{
+					it = bricks.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+		}
 	}
 
+
+
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
+	if (bricks.empty()) {
+		ball.x_velocity *= 0;
+		ball.y_velocity *= 0;
+		Render();
+	}
 
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
@@ -95,4 +189,11 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	if (ball.y_position == 35)
+	{
+		ball.x_velocity *= 0;
+		ball.y_velocity *= 0;
+		Render();
+	}
 }
