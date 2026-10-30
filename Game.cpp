@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
+#include <sstream>
+#include <windows.h>
 
 Game::Game()
 {
@@ -110,7 +112,20 @@ void Game::Render() const
 	}
 
 	if (bricks.empty()) {
+		std::string text = "You win! Press R to play again.";
 
+		HANDLE stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD coord;
+
+		GetConsoleScreenBufferInfo(stdoutHandle, &csbi);
+		int width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+		coord.X = (short)((width - text.length()) / 2);
+		coord.Y = (short)(height / 2);
+		SetConsoleCursorPosition(stdoutHandle, coord);
+		std::cout << text << std::endl;
 	}
 
 	Console::Lock(false);
@@ -144,7 +159,9 @@ void Game::CheckCollision()
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 	if (bricks.empty()) {
-
+		ball.x_velocity *= 0;
+		ball.y_velocity *= 0;
+		Render();
 	}
 
 
