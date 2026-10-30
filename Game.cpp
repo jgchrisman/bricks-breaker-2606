@@ -26,6 +26,11 @@ void Game::Reset()
 	brick.y_position = 5;
 	brick.doubleThick = true;
 	brick.color = ConsoleColor::DarkGreen;
+	bricks.push_back(brick);
+	bricks.push_back(brick);
+	bricks.push_back(brick);
+	bricks.push_back(brick);
+	bricks.push_back(brick);
 }
 
 void Game::ResetBall()
