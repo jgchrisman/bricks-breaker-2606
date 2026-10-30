@@ -128,6 +128,24 @@ void Game::Render() const
 		std::cout << text << std::endl;
 	}
 
+	if (ball.y_position == 35)
+	{
+		std::string text = "You Lose. Press R to play again.";
+
+		HANDLE stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD coord;
+
+		GetConsoleScreenBufferInfo(stdoutHandle, &csbi);
+		int width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+		coord.X = (short)((width - text.length()) / 2);
+		coord.Y = (short)(height / 2);
+		SetConsoleCursorPosition(stdoutHandle, coord);
+		std::cout << text << std::endl;
+	}
+
 	Console::Lock(false);
 }
 
@@ -171,4 +189,11 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	if (ball.y_position == 35)
+	{
+		ball.x_velocity *= 0;
+		ball.y_velocity *= 0;
+		Render();
+	}
 }
