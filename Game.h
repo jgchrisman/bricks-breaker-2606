@@ -7,10 +7,11 @@ class Game
 {
 	Ball ball;
 	Box paddle;
+	Box brick;
 
 	// TODO #1 - Instead of storing 1 brick, store a vector of bricks (by value)
 	std::vector<Box> bricks;
-	Box brick;
+
 
 public:
 	Game();
